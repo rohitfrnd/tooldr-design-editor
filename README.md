@@ -1,20 +1,23 @@
-# ToolDr.ai Design Editor — MVP
+# ToolDr.ai Design Editor v2
 
-A dependency-free, mobile-friendly 1080×1350 social-post layer editor.
+Mobile-friendly layer editor for 1080×1350 social posts.
 
-### Included
-- Text layers with fixed font family, size, weight and color
-- Shape layers
-- Image upload layers
-- Drag-and-drop positioning
-- Layer list and property editor
-- Project background/name
+## v2 features
+- Text, shape and image layers
+- Drag/move layers
+- 8-point resize handles
+- Rotation handle
+- Layer visibility and lock
+- Duplicate, delete, bring front, send back
+- Font, size, weight, alignment, color, opacity and geometry controls
+- Zoom + Fit controls
 - Local save/load
-- Scene JSON export/import
-- No API keys or paid services required
+- Scene JSON import/export
+- Real PNG export using the browser Canvas API
+- No paid dependency and no API key required
 
-### Run
-Open `index.html` directly in a browser, or serve the folder with any static server.
+## Run
+Open `index.html` or serve the folder with any static web server.
 
-### Supabase
-The existing ToolDr.ai Supabase backend already has `public.design_projects`. This MVP intentionally keeps persistence local so it can run with zero dependencies. The next integration step is to connect the Save/Load buttons to that table after the host app's Supabase auth session is available.
+## Supabase
+The ToolDr.ai Supabase project already contains `public.design_projects`. Persistence can be connected once the host app exposes the authenticated Supabase session.
