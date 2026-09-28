@@ -101,7 +101,7 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let currentUser=null, authSignup=false;
 const state={page:'studio',projectId:null,chars:[],scenes:[],style:'Cinematic Realism',ratio:'16:9',sceneCount:10,output:'Cinematic story',assets:[],consistent:true};
 const styles=[['Cinematic Realism','🎬','Natural lighting, film-grade composition, realistic textures'],['Animated 3D','🧸','Polished 3D characters, soft studio lighting, expressive'],['Anime','🌸','Clean linework, stylized characters, cinematic backgrounds'],['Illustration','🖌️','Editorial illustration, textured brushwork, rich shapes'],['Comic','💥','Graphic panels, strong silhouettes, expressive action'],['Watercolor','🌊','Soft washes, paper texture, atmospheric edges']];
-const $=s=>document.querySelector(s),$=s=>[...document.querySelectorAll(s)];
+const $=s=>document.querySelector(s); const $$=s=>[...document.querySelectorAll(s)];
 function nav(page){state.page=page;$('.page').forEach(x=>x.classList.toggle('hidden',x.id!==page));$('[data-page]').forEach(x=>x.classList.toggle('active',x.dataset.page===page));$('#crumb').textContent=page[0].toUpperCase()+page.slice(1)}
 $('[data-page]').forEach(b=>b.onclick=()=>nav(b.dataset.page));
 $('.chips').forEach(group=>group.onclick=e=>{if(!e.target.classList.contains('chip'))return;group.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));e.target.classList.add('on');if(group.id==='ratios')state.ratio=e.target.textContent;if(group.id==='counts')state.sceneCount=e.target.textContent==='Custom'?10:Number(e.target.textContent);if(group.id==='types')state.output=e.target.textContent;});
