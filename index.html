@@ -116,10 +116,13 @@ async function save(){
  if(q.error){alert('Save failed: '+q.error.message);return}
  await sb.from('story_characters').delete().eq('project_id',state.projectId);
  await sb.from('story_scenes').delete().eq('project_id',state.projectId);
- const chars=state.chars.map(c=>({project_id:state.projectId,user_id:currentUser.id,name:c.name,description:c.desc||'',reference_image_url:c.image||null}));
+ const chars=state.chars.map(c=>({project_id:state.projectId,user_id:currentUser.id,name:c.name,description:c.desc||'',reference_image_url:(c.image||'').startsWith('http')?c.image:null}));
  if(chars.length) await sb.from('story_characters').insert(chars);
  const scenes=state.scenes.map((title,i)=>({project_id:state.projectId,user_id:currentUser.id,scene_order:i+1,title,description:'',status:'draft'}));
  if(scenes.length) await sb.from('story_scenes').insert(scenes);
+ await sb.from('story_assets').delete().eq('project_id',state.projectId);
+ const assets=state.assets.map(a=>({project_id:state.projectId,user_id:currentUser.id,name:a.name,asset_type:'image',metadata:{local_preview:true}}));
+ if(assets.length) await sb.from('story_assets').insert(assets);
  const data={...state,story:story.value,projectName:$('#projectName').value};
  localStorage.setItem('tooldr-story-project',JSON.stringify(data));
  const b=$('#saveDraft');b.textContent='Saved ✓';setTimeout(()=>b.textContent='Save draft',1400)
