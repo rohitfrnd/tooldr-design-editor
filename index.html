@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>ToolDr — Story Studio</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#f5f6f8;--panel:#fff;--panel2:#f9fafb;--line:#e5e7eb;--text:#111827;--muted:#6b7280;--accent:#635bff;--accent2:#7c3aed;--green:#16a34a;--danger:#ef4444;--shadow:0 8px 30px rgba(17,24,39,.06);--r:16px}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer}.app{min-height:100vh;display:flex}
@@ -31,7 +32,7 @@
  <div class="mobilebar">
   <button class="active" data-page="studio">◉<span>Studio</span></button><button data-page="characters">♙<span>Characters</span></button><button data-page="scenes">▦<span>Scenes</span></button><button data-page="styles">✦<span>Style</span></button><button data-page="settings">⚙<span>Settings</span></button>
  </div>
- <div class="topbar"><div class="crumb">Workspace / <b id="crumb">Studio</b></div><div class="topactions"><button class="ghost" id="saveDraft">Save draft</button><button class="primary" id="newProject">＋ New project</button></div></div>
+ <div class="topbar"><div class="crumb">Workspace / <b id="crumb">Studio</b></div><div class="topactions"><button class="ghost" id="authButton">Sign in</button><button class="ghost" id="loadProject">Load</button><button class="ghost" id="saveDraft">Save draft</button><button class="primary" id="newProject">＋ New project</button></div></div>
  <section id="studio" class="page">
   <div class="pagehead"><div><div class="eyebrow">AI CREATIVE WORKSPACE</div><h1>Build your story visually.</h1><div class="sub">Turn any story, script or idea into structured characters, scenes and image-ready prompts. Nothing is locked to a single story.</div></div><button class="primary" id="planStory">Create scene plan →</button></div>
   <div class="workspace">
@@ -84,10 +85,21 @@
    <div class="notice">For the MVP, provider credentials can remain local. A secure server-side generation layer can be added before public launch.</div>
   </div></div>
  </section>
-<input id="assetFile" type="file" accept="image/*" class="hidden"><div class="modal" id="charModal"><div class="modalbox"><div class="modalhead"><b>Add character</b><button class="iconbtn" id="charCancel">×</button></div><div class="modalbody"><div class="field"><div class="label">Character name</div><input class="input" id="charName" placeholder="e.g. Arjun"></div><div class="field"><div class="label">Description</div><textarea class="textarea" id="charDesc" style="min-height:120px" placeholder="Appearance, age, personality, clothing, distinctive features..."></textarea></div><div class="field"><div class="label">Reference image</div><label class="filedrop" for="charFile" id="charPreview">📷<br><small>Optional reference image</small></label><input id="charFile" type="file" accept="image/*" class="hidden"></div></div><div class="modalfoot"><button class="ghost" id="charCancel2">Cancel</button><button class="primary" id="charSave">Add character</button></div></div></div></main>
+<input id="assetFile" type="file" accept="image/*" class="hidden">
+<div class="modal" id="authModal"><div class="modalbox"><div class="modalhead"><b id="authTitle">Sign in to ToolDr</b><button class="iconbtn" id="authClose">×</button></div><div class="modalbody">
+<div class="field"><div class="label">Email</div><input class="input" id="authEmail" type="email" autocomplete="email" placeholder="you@example.com"></div>
+<div class="field"><div class="label">Password</div><input class="input" id="authPassword" type="password" autocomplete="current-password" placeholder="Minimum 6 characters"></div>
+<div class="notice" id="authNotice">Your projects are saved securely to your ToolDr account.</div>
+</div><div class="modalfoot"><button class="ghost" id="authMode">Create account</button><button class="primary" id="authSubmit">Sign in</button></div></div></div>
+<div class="modal" id="projectModal"><div class="modalbox"><div class="modalhead"><b>Load project</b><button class="iconbtn" id="projectClose">×</button></div><div class="modalbody"><div id="projectList" class="scenegrid"></div></div></div></div>
+<div class="modal" id="charModal"><div class="modalbox"><div class="modalhead"><b>Add character</b><button class="iconbtn" id="charCancel">×</button></div><div class="modalbody"><div class="field"><div class="label">Character name</div><input class="input" id="charName" placeholder="e.g. Arjun"></div><div class="field"><div class="label">Description</div><textarea class="textarea" id="charDesc" style="min-height:120px" placeholder="Appearance, age, personality, clothing, distinctive features..."></textarea></div><div class="field"><div class="label">Reference image</div><label class="filedrop" for="charFile" id="charPreview">📷<br><small>Optional reference image</small></label><input id="charFile" type="file" accept="image/*" class="hidden"></div></div><div class="modalfoot"><button class="ghost" id="charCancel2">Cancel</button><button class="primary" id="charSave">Add character</button></div></div></div></main>
 </div>
 <script>
-const state={page:'studio',chars:[],scenes:[],style:'Cinematic Realism',ratio:'16:9',sceneCount:10,output:'Cinematic story',assets:[],consistent:true};
+const SUPABASE_URL='https://icjuhjbkndtebhdbefzm.supabase.co';
+const SUPABASE_KEY='sb_publishable_d9b-3vD5yALras2ReqNDmg_rwjB_c6G';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let currentUser=null, authSignup=false;
+const state={page:'studio',projectId:null,chars:[],scenes:[],style:'Cinematic Realism',ratio:'16:9',sceneCount:10,output:'Cinematic story',assets:[],consistent:true};
 const styles=[['Cinematic Realism','🎬','Natural lighting, film-grade composition, realistic textures'],['Animated 3D','🧸','Polished 3D characters, soft studio lighting, expressive'],['Anime','🌸','Clean linework, stylized characters, cinematic backgrounds'],['Illustration','🖌️','Editorial illustration, textured brushwork, rich shapes'],['Comic','💥','Graphic panels, strong silhouettes, expressive action'],['Watercolor','🌊','Soft washes, paper texture, atmospheric edges']];
 const $=s=>document.querySelector(s),$=s=>[...document.querySelectorAll(s)];
 function nav(page){state.page=page;$('.page').forEach(x=>x.classList.toggle('hidden',x.id!==page));$('[data-page]').forEach(x=>x.classList.toggle('active',x.dataset.page===page));$('#crumb').textContent=page[0].toUpperCase()+page.slice(1)}
@@ -95,8 +107,39 @@ $('[data-page]').forEach(b=>b.onclick=()=>nav(b.dataset.page));
 $('.chips').forEach(group=>group.onclick=e=>{if(!e.target.classList.contains('chip'))return;group.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));e.target.classList.add('on');if(group.id==='ratios')state.ratio=e.target.textContent;if(group.id==='counts')state.sceneCount=e.target.textContent==='Custom'?10:Number(e.target.textContent);if(group.id==='types')state.output=e.target.textContent;});
 $('[data-switch]').forEach(x=>x.onclick=()=>{x.classList.toggle('on');state.consistent=x.classList.contains('on')});
 const story=$('#story');function counts(){$('#wordCount').textContent=(story.value.trim().match(/\S+/g)||[]).length;$('#charCount').textContent=state.chars.length;$('#sceneCount').textContent=state.scenes.length}story.oninput=counts;
-function save(){const data={...state,story:story.value,projectName:$('#projectName').value};localStorage.setItem('tooldr-story-project',JSON.stringify(data));const b=$('#saveDraft');b.textContent='Saved ✓';setTimeout(()=>b.textContent='Save draft',1400)}
-function load(){try{const d=JSON.parse(localStorage.getItem('tooldr-story-project'));if(!d)return;Object.assign(state,d);story.value=d.story||'';$('#projectName').value=d.projectName||'Untitled Story';renderChars();renderScenes();renderAssets();$('#styleName').textContent=state.style;counts()}catch(e){}}
+async function save(){
+ if(!currentUser){openAuth();return}
+ const payload={user_id:currentUser.id,name:$('#projectName').value.trim()||'Untitled Story',story:story.value,output_type:state.output,aspect_ratio:state.ratio,scene_count:Number(state.sceneCount)||10,visual_style:state.style,consistent_visuals:state.consistent};
+ let q;
+ if(state.projectId){q=await sb.from('story_projects').update(payload).eq('id',state.projectId).select('id').single()}
+ else{q=await sb.from('story_projects').insert(payload).select('id').single();if(!q.error)state.projectId=q.data.id}
+ if(q.error){alert('Save failed: '+q.error.message);return}
+ await sb.from('story_characters').delete().eq('project_id',state.projectId);
+ await sb.from('story_scenes').delete().eq('project_id',state.projectId);
+ const chars=state.chars.map(c=>({project_id:state.projectId,user_id:currentUser.id,name:c.name,description:c.desc||'',reference_image_url:c.image||null}));
+ if(chars.length) await sb.from('story_characters').insert(chars);
+ const scenes=state.scenes.map((title,i)=>({project_id:state.projectId,user_id:currentUser.id,scene_order:i+1,title,description:'',status:'draft'}));
+ if(scenes.length) await sb.from('story_scenes').insert(scenes);
+ const data={...state,story:story.value,projectName:$('#projectName').value};
+ localStorage.setItem('tooldr-story-project',JSON.stringify(data));
+ const b=$('#saveDraft');b.textContent='Saved ✓';setTimeout(()=>b.textContent='Save draft',1400)
+}
+async function load(){try{
+ if(!currentUser){openAuth();return}
+ if(!state.projectId){return}
+ const p=await sb.from('story_projects').select('*').eq('id',state.projectId).single();
+ if(p.error){alert('Project load failed: '+p.error.message);return}
+ const [ch,sc]=await Promise.all([
+  sb.from('story_characters').select('*').eq('project_id',state.projectId).order('created_at'),
+  sb.from('story_scenes').select('*').eq('project_id',state.projectId).order('scene_order')
+ ]);
+ const d=p.data; state.output=d.output_type;state.ratio=d.aspect_ratio;state.sceneCount=d.scene_count;state.style=d.visual_style;state.consistent=d.consistent_visuals;
+ state.chars=(ch.data||[]).map(x=>({id:x.id,name:x.name,desc:x.description,image:x.reference_image_url||''}));
+ state.scenes=(sc.data||[]).map(x=>x.title);
+ story.value=d.story||'';$('#projectName').value=d.name||'Untitled Story';$('#styleName').textContent=state.style;
+ renderChars();renderScenes();renderAssets();counts();localStorage.setItem('tooldr-story-project',JSON.stringify({...state,story:story.value,projectName:$('#projectName').value}));
+ }catch(e){alert('Load failed: '+e.message)}}
+function loadLocal(){try{const d=JSON.parse(localStorage.getItem('tooldr-story-project'));if(!d)return;Object.assign(state,d);story.value=d.story||'';$('#projectName').value=d.projectName||'Untitled Story';renderChars();renderScenes();renderAssets();$('#styleName').textContent=state.style;counts()}catch(e){}}
 function plan(){if(!story.value.trim()){alert('Add a story or idea first.');return}const n=Number(state.sceneCount)||10;const base=['Opening / Establishing shot','Inciting moment','Character introduction','First turning point','Rising action','Key discovery','Conflict','Emotional beat','Climax','Closing shot'];state.scenes=Array.from({length:n},(_,i)=>base[i%base.length]+(i>=base.length?' — beat '+(i+1):''));renderScenes();counts();save();nav('scenes')}
 function renderScenes(){const g=$('#sceneGrid');if(!state.scenes.length){g.innerHTML='<div class="empty"><div class="big">▦</div><b>No scenes yet</b><p>Create a scene plan from your story.</p></div>';return}g.innerHTML=state.scenes.map((x,i)=>'<div class="scene"><div class="num">'+(i+1)+'</div><div><input class="scene-edit" data-i="'+i+'" value="'+esc(x)+'"><p>Editable scene · camera · characters · environment · action</p></div><div class="scene-actions"><button class="smallbtn" data-up="'+i+'">↑</button><button class="smallbtn" data-down="'+i+'">↓</button><button class="smallbtn" data-del="'+i+'">×</button></div></div>').join('');
 $('.scene-edit').forEach(el=>el.onchange=()=>{state.scenes[el.dataset.i]=el.value;save()});$('[data-up]').forEach(b=>b.onclick=()=>move(+b.dataset.up,-1));$('[data-down]').forEach(b=>b.onclick=()=>move(+b.dataset.down,1));$('[data-del]').forEach(b=>b.onclick=()=>{state.scenes.splice(+b.dataset.del,1);renderScenes();counts();save()})}
@@ -116,6 +159,37 @@ $('#saveDraft').onclick=save;
 $('#newProject').onclick=()=>{if(!confirm('Start a new project? Unsaved changes will be cleared.'))return;localStorage.removeItem('tooldr-story-project');location.reload()};
 $('#styleGrid').innerHTML=styles.map((s,i)=>'<div class="mini" style="cursor:pointer" data-style="'+i+'"><div class="avatar">'+s[1]+'</div><b>'+s[0]+'</b><p>'+s[2]+'</p><button class="smallbtn" style="margin-top:9px">Use style</button></div>').join('');
 $('[data-style]').forEach(c=>c.onclick=()=>{state.style=styles[+c.dataset.style][0];$('#styleName').textContent=state.style;save()});
-load();renderChars();renderScenes();renderAssets();counts();
+async function listProjects(){
+ if(!currentUser){openAuth();return}
+ const r=await sb.from('story_projects').select('id,name,story,updated_at').order('updated_at',{ascending:false});
+ if(r.error){alert('Could not load projects: '+r.error.message);return}
+ const box=$('#projectList');
+ box.innerHTML=r.data.length?r.data.map(p=>'<button class="tooltab" data-project="'+p.id+'" style="text-align:left;padding:12px"><b>'+esc(p.name)+'</b><br><small>'+new Date(p.updated_at).toLocaleString()+'</small></button>').join(''):'<div class="empty"><b>No saved projects yet.</b><p>Save your current project first.</p></div>';
+ $('#projectModal').classList.add('show');
+ $('[data-project]').forEach(b=>b.onclick=async()=>{state.projectId=b.dataset.project;$('#projectModal').classList.remove('show');await load()});
+}
+function openAuth(){ $('#authModal').classList.add('show'); $('#authEmail').focus() }
+function closeAuth(){ $('#authModal').classList.remove('show') }
+$('#authButton').onclick=()=>currentUser?sb.auth.signOut():openAuth();
+$('#authClose').onclick=closeAuth;
+$('#projectClose').onclick=()=>$('#projectModal').classList.remove('show');
+$('#loadProject').onclick=listProjects;
+$('#authMode').onclick=()=>{authSignup=!authSignup;$('#authTitle').textContent=authSignup?'Create your ToolDr account':'Sign in to ToolDr';$('#authSubmit').textContent=authSignup?'Create account':'Sign in';$('#authMode').textContent=authSignup?'Back to sign in':'Create account'};
+$('#authSubmit').onclick=async()=>{
+ const email=$('#authEmail').value.trim(),password=$('#authPassword').value;
+ if(!email||password.length<6){$('#authNotice').textContent='Enter a valid email and a password of at least 6 characters.';return}
+ const r=authSignup?await sb.auth.signUp({email,password}):await sb.auth.signInWithPassword({email,password});
+ if(r.error){$('#authNotice').textContent=r.error.message;return}
+ if(authSignup&&!r.data.session){$('#authNotice').textContent='Account created. Check your email if confirmation is required, then sign in.';return}
+ closeAuth();
+};
+sb.auth.onAuthStateChange((_event,session)=>{
+ currentUser=session?.user||null;
+ const b=$('#authButton');
+ b.textContent=currentUser?(currentUser.email?.split('@')[0]+' · Sign out'):'Sign in';
+});
+loadLocal();renderChars();renderScenes();renderAssets();counts();
+sb.auth.getSession().then(({data})=>{currentUser=data.session?.user||null;$('#authButton').textContent=currentUser?(currentUser.email?.split('@')[0]+' · Sign out'):'Sign in'});
+
 </script>
 </body></html>
