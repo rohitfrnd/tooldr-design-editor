@@ -96,7 +96,7 @@ function autoSceneCount(text){
  const paragraphs=text.split(/\n\s*\n/).filter(x=>x.trim()).length;
  const sentences=(text.match(/[.!?]+(?=\s|$)/g)||[]).length;
  const dialogue=(text.match(/["“”]/g)||[]).length/2;
- let count=Math.round(w/45);
+ let count=Math.round(w/40);
  if(paragraphs>=4)count+=Math.min(2,Math.floor(paragraphs/5));
  if(sentences>=18)count+=1;
  if(dialogue>=4)count+=1;
