@@ -1,259 +1,134 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>ToolDr — Story Studio</title>
-
 <style>
-:root{--bg:#f5f6f8;--panel:#fff;--panel2:#f9fafb;--line:#e5e7eb;--text:#111827;--muted:#6b7280;--accent:#635bff;--accent2:#7c3aed;--green:#16a34a;--danger:#ef4444;--shadow:0 8px 30px rgba(17,24,39,.06);--r:16px}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer}.app{min-height:100vh;display:flex}
-.sidebar{width:238px;background:#fff;border-right:1px solid var(--line);position:fixed;inset:0 auto 0 0;padding:18px 12px;z-index:20;display:flex;flex-direction:column}.brand{display:flex;align-items:center;gap:10px;padding:5px 10px 24px}.mark{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,#635bff,#8b5cf6);color:white;display:grid;place-items:center;font-weight:900}.brand b{font-size:17px}.brand span{font-size:10px;color:var(--muted);display:block;margin-top:2px}.nav{display:grid;gap:4px}.nav button{border:0;background:transparent;text-align:left;padding:11px 12px;border-radius:11px;color:#667085;font-weight:650;display:flex;align-items:center;gap:11px}.nav button:hover,.nav button.active{background:#f1f0ff;color:#5148d9}.ico{width:19px;text-align:center}.sidebottom{margin-top:auto;padding:10px}.plan{border:1px solid var(--line);background:var(--panel2);border-radius:13px;padding:12px;font-size:11px;color:var(--muted)}.plan strong{display:block;color:var(--text);margin-bottom:5px}
-.main{margin-left:238px;width:calc(100% - 238px);padding:25px 30px 50px}.mobilebar{display:none}.topbar{height:42px;display:flex;align-items:center;justify-content:space-between;margin-bottom:23px}.crumb{font-size:12px;color:var(--muted)}.topactions{display:flex;gap:8px}.iconbtn,.ghost{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 11px;color:#4b5563}.primary{border:0;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:10px;padding:9px 14px;font-weight:750;box-shadow:0 5px 16px rgba(99,91,255,.22)}.pagehead{display:flex;justify-content:space-between;gap:20px;margin-bottom:20px}.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:10px;font-weight:800;color:#766df0}.pagehead h1{font-size:28px;margin:5px 0 5px}.sub{color:var(--muted);max-width:650px;line-height:1.5}.workspace{display:grid;grid-template-columns:minmax(0,1fr) 315px;gap:18px}.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}.cardhead{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}.cardhead h2{font-size:15px;margin:0}.cardbody{padding:18px}.label{font-size:11px;font-weight:800;color:#475467;text-transform:uppercase;letter-spacing:.07em;margin:0 0 7px}.field{margin-bottom:16px}.input,.textarea,.select{width:100%;border:1px solid var(--line);background:#fbfcfd;border-radius:11px;padding:11px 12px;outline:none;color:var(--text)}.textarea{min-height:235px;resize:vertical;line-height:1.6}.input:focus,.textarea:focus,.select:focus{border-color:#a5a0ff;box-shadow:0 0 0 3px #efedff}.chips{display:flex;flex-wrap:wrap;gap:7px}.chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:7px 10px;font-size:11px;color:#667085}.chip.on{background:#f0efff;border-color:#c9c5ff;color:#5148d9;font-weight:700}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}.stat{border:1px solid var(--line);background:var(--panel2);padding:12px;border-radius:12px}.stat b{font-size:18px}.stat span{display:block;color:var(--muted);font-size:10px;margin-top:2px}.row{display:flex;gap:8px;align-items:center}.between{justify-content:space-between}.help{color:var(--muted);font-size:11px;line-height:1.5}.divider{height:1px;background:var(--line);margin:18px 0}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.mini{border:1px solid var(--line);border-radius:13px;padding:13px;background:#fff}.avatar{height:110px;border-radius:10px;background:linear-gradient(135deg,#eeeefb,#f7f7fb);display:grid;place-items:center;font-size:42px;margin-bottom:10px}.mini b{font-size:13px}.mini p{font-size:11px;color:var(--muted);line-height:1.4;margin:5px 0 0}.scenegrid{display:grid;gap:9px}.scene{display:grid;grid-template-columns:30px 1fr auto;gap:11px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:11px;background:#fff}.num{width:28px;height:28px;border-radius:8px;background:#f0efff;color:#5a51df;display:grid;place-items:center;font-weight:800;font-size:11px}.scene b{font-size:12px}.scene p{margin:3px 0 0;color:var(--muted);font-size:10px}.badge{font-size:10px;border-radius:99px;padding:5px 8px;background:#f2f4f7;color:#667085}.badge.ready{background:#ecfdf3;color:#15803d}.toolbar{display:flex;gap:7px;flex-wrap:wrap}.tooltab{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 10px;font-size:11px;color:#667085}.tooltab.active{background:#111827;color:#fff;border-color:#111827}.empty{padding:40px 15px;text-align:center;color:var(--muted)}.empty .big{font-size:30px;margin-bottom:10px}.notice{background:#f8f7ff;border:1px solid #e4e1ff;border-radius:12px;padding:12px;font-size:11px;color:#5b56a8;line-height:1.5}.switch{width:40px;height:23px;border-radius:99px;background:#d1d5db;padding:3px}.switch i{display:block;width:17px;height:17px;background:#fff;border-radius:50%;transition:.2s}.switch.on{background:var(--accent)}.switch.on i{transform:translateX(17px)}.progress{height:7px;background:#edf0f3;border-radius:99px;overflow:hidden}.progress i{display:block;width:42%;height:100%;background:linear-gradient(90deg,var(--accent),#a855f7);border-radius:99px}.hidden{display:none!important}
-@media(max-width:900px){.sidebar{width:205px}.main{margin-left:205px;width:calc(100% - 205px);padding:20px}.workspace{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:680px){body{padding-bottom:70px}.sidebar{display:none}.main{margin:0;width:100%;padding:14px 13px 28px}.mobilebar{display:flex;position:fixed;left:0;right:0;bottom:0;height:64px;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border-top:1px solid var(--line);z-index:50;justify-content:space-around;padding:6px 4px}.mobilebar button{border:0;background:none;color:#7b8492;font-size:9px;display:flex;flex-direction:column;align-items:center;gap:4px}.mobilebar button.active{color:#5b52dc;font-weight:800}.topbar{margin-bottom:15px}.crumb{display:none}.topactions .ghost{display:block;padding:7px 8px;font-size:10px}.pagehead{display:block}.pagehead h1{font-size:23px}.sub{font-size:12px}.workspace{display:block}.card{margin-bottom:13px}.cardbody{padding:14px}.cards{grid-template-columns:1fr 1fr}.textarea{min-height:190px}.stats{gap:7px}.stat{padding:10px}.stat b{font-size:16px}.scene{grid-template-columns:28px 1fr}.scene .badge{display:none}.primary{padding:9px 11px}.pagehead .primary{margin-top:12px;width:100%}}
- .modal{position:fixed;inset:0;background:rgba(15,23,42,.42);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:16px;z-index:100}.modal.show{display:flex}.modalbox{width:min(520px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:18px;border:1px solid var(--line);box-shadow:0 25px 70px rgba(15,23,42,.22)}.modalhead{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.modalbody{padding:18px}.modalfoot{padding:14px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}.filedrop{border:1.5px dashed #cbd0d8;border-radius:12px;padding:18px;text-align:center;color:var(--muted);background:#fafbfc}.thumb{width:72px;height:72px;border-radius:10px;object-fit:cover;display:block;margin:0 auto 8px}.scene-actions{display:flex;gap:5px}.smallbtn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 8px;font-size:10px;color:#667085}.smallbtn:hover{background:#f8f9fb}.scene-edit{width:100%;border:0;background:transparent;font-weight:700;outline:none}.assetgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.asset{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}.asset img{width:100%;height:130px;object-fit:cover;display:block}.asset .meta{padding:9px;font-size:10px;color:var(--muted)}@media(max-width:680px){.assetgrid{grid-template-columns:repeat(2,1fr)}.asset img{height:120px}}\n</style>
+:root{--bg:#f6f7fb;--card:#fff;--line:#e5e7eb;--text:#111827;--muted:#667085;--accent:#635bff;--accent2:#7c3aed;--soft:#f0efff;--ok:#15803d;--danger:#dc2626;--r:18px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer}
+.wrap{max-width:1040px;margin:auto;padding:24px 18px 60px}.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}.brand{display:flex;align-items:center;gap:10px}.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:grid;place-items:center;font-weight:900}.brand b{font-size:17px}.brand small{display:block;color:var(--muted);font-size:10px;margin-top:2px}.topBtns{display:flex;gap:7px}.btn{border:1px solid var(--line);background:#fff;color:#475467;border-radius:10px;padding:9px 12px;font-weight:650}.btn.primary{border:0;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 6px 18px #635bff2e}.btn:disabled{opacity:.55;cursor:wait}
+.hero{margin:8px 0 20px}.eyebrow{font-size:10px;font-weight:850;letter-spacing:.14em;color:#7168e8}.hero h1{font-size:30px;margin:5px 0}.hero p{color:var(--muted);max-width:680px;line-height:1.5;margin:0}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:20px 0}.step{padding:11px 12px;border:1px solid var(--line);background:#fff;border-radius:12px;color:#98a2b3;font-size:11px;font-weight:750}.step b{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:7px;background:#f2f4f7;margin-right:7px}.step.active{border-color:#c9c5ff;background:#f8f7ff;color:#5148d9}.step.active b{background:var(--soft);color:#5148d9}.step.done{color:#15803d}.step.done b{background:#ecfdf3;color:#15803d}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 8px 28px #1118270a;margin-bottom:14px}.head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px}.head h2{margin:0;font-size:16px}.body{padding:18px}.label{font-size:11px;font-weight:850;letter-spacing:.07em;text-transform:uppercase;color:#475467;margin-bottom:7px}.field{margin-bottom:16px}.input,.textarea{width:100%;border:1px solid var(--line);background:#fbfcfd;border-radius:12px;padding:12px;outline:0;color:var(--text)}.textarea{min-height:220px;resize:vertical;line-height:1.6}.input:focus,.textarea:focus{border-color:#aaa5ff;box-shadow:0 0 0 3px #efedff}.chips{display:flex;gap:7px;flex-wrap:wrap}.chip{border:1px solid var(--line);background:#fff;color:#667085;border-radius:999px;padding:8px 11px;font-size:11px}.chip.on{background:var(--soft);border-color:#c9c5ff;color:#5148d9;font-weight:750}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:11px}.stat b{font-size:18px}.stat span{display:block;color:var(--muted);font-size:10px;margin-top:2px}.notice{background:#f8f7ff;border:1px solid #e4e1ff;border-radius:12px;padding:12px;color:#5b56a8;font-size:11px;line-height:1.5}.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}.status{font-size:11px;color:var(--muted);min-height:17px;margin-top:8px}.status.ok{color:var(--ok)}.status.err{color:var(--danger)}
+.section.locked{display:none}.section-title{display:flex;justify-content:space-between;align-items:end;margin:22px 0 10px}.section-title h2{margin:0;font-size:18px}.section-title p{margin:3px 0 0;color:var(--muted);font-size:11px}.scene-list{display:grid;gap:9px}.scene{border:1px solid var(--line);border-radius:13px;padding:12px;background:#fff}.sceneTop{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:start}.num{width:29px;height:29px;border-radius:8px;background:var(--soft);color:#554cd8;display:grid;place-items:center;font-weight:850;font-size:11px}.sceneTitle{width:100%;border:0;outline:0;font-weight:800;font-size:13px;padding:2px 0;background:transparent}.sceneDesc{margin:5px 0 0;color:var(--muted);font-size:11px;line-height:1.45}.sceneActions{display:flex;gap:5px}.mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 8px;font-size:10px;color:#667085}.mini:hover{background:#f8f9fb}.prompt{margin-top:10px}.prompt textarea{min-height:120px}.charGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.char{border:1px solid var(--line);border-radius:13px;padding:12px}.char b{font-size:13px}.char p{font-size:11px;color:var(--muted);line-height:1.45;margin:5px 0 0}.promptGrid{display:grid;gap:9px}.promptCard{border:1px solid var(--line);border-radius:13px;padding:12px}.promptCard b{font-size:12px}.promptText{width:100%;min-height:130px;margin-top:8px}.styleRow{display:flex;gap:8px;flex-wrap:wrap}.style{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;text-align:left}.style.on{background:var(--soft);border-color:#c9c5ff;color:#5148d9}.footerNote{text-align:center;color:#98a2b3;font-size:10px;margin-top:22px}.hidden{display:none!important}
+.modal{position:fixed;inset:0;background:#0f172a66;backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}.modal.show{display:flex}.modalBox{width:min(520px,100%);max-height:85vh;overflow:auto;background:#fff;border-radius:18px}.modalHead{padding:15px 17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}.modalBody{padding:16px}.project{width:100%;border:1px solid var(--line);background:#fff;border-radius:11px;padding:12px;text-align:left;margin-bottom:7px}.empty{text-align:center;padding:28px;color:var(--muted);font-size:11px}.empty strong{display:block;color:var(--text);font-size:13px;margin-bottom:4px}
+@media(max-width:700px){.wrap{padding:15px 12px 35px}.top{margin-bottom:17px}.topBtns .btn:first-child{display:none}.hero h1{font-size:24px}.steps{grid-template-columns:repeat(4,1fr);gap:5px}.step{padding:8px 5px;text-align:center;font-size:9px}.step b{display:block;margin:0 auto 4px}.grid2{grid-template-columns:1fr}.charGrid{grid-template-columns:1fr 1fr}.body{padding:14px}.head{padding:14px}.textarea{min-height:190px}.sceneTop{grid-template-columns:28px 1fr}.sceneActions{grid-column:2}.actions{justify-content:stretch}.actions .btn{flex:1}}
+</style>
 </head>
 <body>
-<div class="app">
-<aside class="sidebar">
- <div class="brand"><div class="mark">T</div><div><b>ToolDr</b><span>Story Studio</span></div></div>
- <nav class="nav">
-  <button class="active" data-page="studio">◉ <span>Studio</span></button>
-  <button data-page="characters">♙ <span>Characters</span></button>
-  <button data-page="scenes">▦ <span>Scenes</span></button>
-  <button data-page="styles">✦ <span>Visual Style</span></button>
-  <button data-page="assets">▧ <span>Assets</span></button>
-  <button data-page="settings">⚙ <span>Settings</span></button>
- </nav>
- <div class="sidebottom"><div class="plan"><strong>AI Story Workspace</strong>Build stories, scenes and consistent visuals from one place.</div></div>
-</aside>
-<main class="main">
- <div class="mobilebar">
-  <button class="active" data-page="studio">◉<span>Studio</span></button><button data-page="characters">♙<span>Characters</span></button><button data-page="scenes">▦<span>Scenes</span></button><button data-page="styles">✦<span>Style</span></button><button data-page="settings">⚙<span>Settings</span></button>
- </div>
- <div class="topbar"><div class="crumb">Workspace / <b id="crumb">Studio</b></div><div class="topactions"><button class="ghost" id="loadProject">Load</button><button class="ghost" id="saveDraft">Save draft</button><button class="primary" id="newProject">＋ New project</button></div></div>
- <section id="studio" class="page">
-  <div class="pagehead"><div><div class="eyebrow">AI CREATIVE WORKSPACE</div><h1>Build your story visually.</h1><div class="sub">Turn any story, script or idea into structured characters, scenes and image-ready prompts. Nothing is locked to a single story.</div></div><button class="primary" id="planStory">Create scene plan →</button></div>
-  <div class="workspace">
-   <div>
-    <div class="card"><div class="cardhead"><h2>Story input</h2><span class="badge">Editable</span></div><div class="cardbody">
-     <div class="field"><div class="label">Project name</div><input class="input" id="projectName" value="Untitled Story"></div>
-     <div class="field"><div class="label">Story / script / idea</div><textarea class="textarea" id="story" placeholder="Paste a story, screenplay, product story, comic script, or describe your idea...">A young traveler arrives in a quiet coastal town and discovers an old lighthouse that seems to remember everyone who visits.</textarea></div>
-     <div class="field"><div class="label">Output type</div><div class="chips" id="types"><button class="chip on">Cinematic story</button><button class="chip">Short film</button><button class="chip">Comic</button><button class="chip">Storyboard</button><button class="chip">Reel</button></div></div>
-     <div class="stats"><div class="stat"><b id="wordCount">24</b><span>Words</span></div><div class="stat"><b id="sceneCount">0</b><span>Scenes planned</span></div><div class="stat"><b id="charCount">0</b><span>Characters</span></div></div>
-    </div></div>
-    <div class="card" style="margin-top:14px"><div class="cardhead"><h2>Generation controls</h2><span class="badge">Change anytime</span></div><div class="cardbody">
-      <div class="field"><div class="label">Aspect ratio</div><div class="chips" id="ratios"><button class="chip on">16:9</button><button class="chip">9:16</button><button class="chip">1:1</button><button class="chip">4:5</button></div></div>
-      <div class="field"><div class="label">Scene count</div><div class="chips" id="counts"><button class="chip">5</button><button class="chip on">10</button><button class="chip">15</button><button class="chip">Custom</button></div></div>
-      <div class="row between"><div><b style="font-size:12px">Keep visual consistency</b><div class="help">Reuse character and style references across scenes.</div></div><button class="switch on" data-switch><i></i></button></div>
-    </div></div>
-   </div>
-   <div>
-    <div class="card"><div class="cardhead"><h2>Project snapshot</h2></div><div class="cardbody">
-      <div class="notice">Your project is modular. Change the story, cast, style, scene count or format without rebuilding the workspace.</div>
-      <div class="divider"></div><div class="label">Active visual style</div><b id="styleName">Cinematic Realism</b><div class="help" style="margin-top:4px">Natural light · detailed environments · film composition</div>
-      <div class="divider"></div><div class="label">Pipeline</div><div class="help">Story → Characters → Scene plan → Prompts → Generation → Assets</div>
-      <button class="primary" style="width:100%;margin-top:15px" id="openScenes">Open scene planner</button>
-    </div></div>
-    <div class="card" style="margin-top:14px"><div class="cardhead"><h2>Generation queue</h2><span class="badge">Preview</span></div><div class="cardbody"><div class="help">No images generated yet.</div><div class="progress" style="margin-top:10px"><i style="width:0"></i></div></div></div>
-   </div>
-  </div>
- </section>
- <section id="characters" class="page hidden">
-  <div class="pagehead"><div><div class="eyebrow">CAST</div><h1>Characters</h1><div class="sub">Create reusable character profiles. Each character can have a reference image, description and visual lock.</div></div><button class="primary" id="addChar">＋ Add character</button></div>
-  <div class="card"><div class="cardhead"><h2>Character library</h2><span class="badge" id="charBadge">0 characters</span></div><div class="cardbody"><div class="cards" id="charGrid"></div></div></div>
- </section>
- <section id="scenes" class="page hidden">
-  <div class="pagehead"><div><div class="eyebrow">STORYBOARD</div><h1>Scene planner</h1><div class="sub">Review, reorder and edit the scene structure before generating anything.</div></div><button class="primary" id="generatePrompts">Generate prompts →</button></div>
-  <div class="card"><div class="cardhead"><h2>Scenes</h2><div class="toolbar"><button class="tooltab active">All</button><button class="tooltab">Draft</button><button class="tooltab">Ready</button></div></div><div class="cardbody"><div class="scenegrid" id="sceneGrid"><div class="empty"><div class="big">▦</div>Click “Create scene plan” to generate scenes from your story.</div></div></div></div>
- </section>
- <section id="styles" class="page hidden">
-  <div class="pagehead"><div><div class="eyebrow">ART DIRECTION</div><h1>Visual style</h1><div class="sub">Pick the visual language for the whole project. You can change it later without changing your story.</div></div></div>
-  <div class="card"><div class="cardhead"><h2>Style presets</h2></div><div class="cardbody"><div class="cards" id="styleGrid"></div></div></div>
- </section>
- <section id="assets" class="page hidden">
-  <div class="pagehead"><div><div class="eyebrow">MEDIA</div><h1>Assets</h1><div class="sub">Keep references, generated frames and project media organized in one place.</div></div><button class="primary" id="uploadAsset">＋ Upload</button></div>
-  <div class="card"><div class="cardbody"><div id="assetGrid" class="assetgrid"></div></div></div>
- </section>
- <section id="settings" class="page hidden">
-  <div class="pagehead"><div><div class="eyebrow">WORKSPACE</div><h1>Settings</h1><div class="sub">Configure generation and project behavior.</div></div></div>
-  <div class="card"><div class="cardhead"><h2>AI provider</h2></div><div class="cardbody">
-   <div class="field"><div class="label">Image generation provider</div><select class="select"><option>Hugging Face</option><option>Provider coming soon</option></select></div>
-   <div class="field"><div class="label">Model</div><input class="input" value="FLUX.1 Schnell"></div>
-   <div class="field"><div class="label">API token</div><input class="input" type="password" placeholder="Paste your token when generation is enabled"></div>
-   <div class="notice">For the MVP, provider credentials can remain local. A secure server-side generation layer can be added before public launch.</div>
-  </div></div>
- </section>
-<input id="assetFile" type="file" accept="image/*" class="hidden">
-<div class="modal" id="promptModal"><div class="modalbox"><div class="modalhead"><b>Generated scene prompts</b><button class="iconbtn" id="promptClose">×</button></div><div class="modalbody"><div id="promptList" class="scenegrid"></div></div></div></div><div class="modal" id="projectModal"><div class="modalbox"><div class="modalhead"><b>Load project</b><button class="iconbtn" id="projectClose">×</button></div><div class="modalbody"><div id="projectList" class="scenegrid"></div></div></div></div>
-<div class="modal" id="charModal"><div class="modalbox"><div class="modalhead"><b>Add character</b><button class="iconbtn" id="charCancel">×</button></div><div class="modalbody"><div class="field"><div class="label">Character name</div><input class="input" id="charName" placeholder="e.g. Arjun"></div><div class="field"><div class="label">Description</div><textarea class="textarea" id="charDesc" style="min-height:120px" placeholder="Appearance, age, personality, clothing, distinctive features..."></textarea></div><div class="field"><div class="label">Reference image</div><label class="filedrop" for="charFile" id="charPreview">📷<br><small>Optional reference image</small></label><input id="charFile" type="file" accept="image/*" class="hidden"></div></div><div class="modalfoot"><button class="ghost" id="charCancel2">Cancel</button><button class="primary" id="charSave">Add character</button></div></div></div></main>
+<div class="wrap">
+<header class="top">
+ <div class="brand"><div class="logo">T</div><div><b>ToolDr</b><small>Story Studio</small></div></div>
+ <div class="topBtns"><button class="btn" id="loadBtn">Load</button><button class="btn" id="saveBtn">Save</button><button class="btn primary" id="newBtn">＋ New</button></div>
+</header>
+
+<div class="hero"><div class="eyebrow">ONE-PAGE AI WORKSPACE</div><h1>Turn your story into a visual plan.</h1><p>Paste the story once. ToolDr builds characters, scenes and image-ready prompts step by step — without leaving this page.</p></div>
+
+<div class="steps">
+ <div class="step active" id="step1"><b>1</b>Story</div><div class="step" id="step2"><b>2</b>AI Plan</div><div class="step" id="step3"><b>3</b>Review</div><div class="step" id="step4"><b>4</b>Prompts</div>
 </div>
+
+<section class="card" id="storyCard">
+ <div class="head"><h2>1. Story & settings</h2><span class="chip on" id="aiState">AI ready</span></div>
+ <div class="body">
+  <div class="field"><div class="label">Project name</div><input class="input" id="projectName" placeholder="e.g. Akhiri Bus"></div>
+  <div class="field"><div class="label">Story / script / idea</div><textarea class="textarea" id="story" placeholder="Paste your complete story, script or idea here..."></textarea></div>
+  <div class="grid2">
+   <div class="field"><div class="label">Output</div><div class="chips" id="types"><button class="chip on">Cinematic story</button><button class="chip">Short film</button><button class="chip">Storyboard</button><button class="chip">Reel</button></div></div>
+   <div class="field"><div class="label">Aspect ratio</div><div class="chips" id="ratios"><button class="chip on">16:9</button><button class="chip">9:16</button><button class="chip">1:1</button><button class="chip">4:5</button></div></div>
+  </div>
+  <div class="grid2">
+   <div class="field"><div class="label">Scenes</div><div class="chips" id="counts"><button class="chip">5</button><button class="chip on">10</button><button class="chip">15</button><button class="chip">20</button></div></div>
+   <div class="field"><div class="label">Visual style</div><div class="chips" id="styles"><button class="chip on">Cinematic Realism</button><button class="chip">Anime</button><button class="chip">Animated 3D</button><button class="chip">Illustration</button></div></div>
+  </div>
+  <div class="stats"><div class="stat"><b id="words">0</b><span>Words</span></div><div class="stat"><b id="sceneTotal">0</b><span>Scenes</span></div><div class="stat"><b id="charTotal">0</b><span>Characters</span></div></div>
+  <div class="actions"><button class="btn primary" id="planBtn">Create AI scene plan →</button></div>
+  <div class="status" id="status"></div>
+ </div>
+</section>
+
+<section class="section locked" id="resultSection">
+ <div class="section-title"><div><h2>2–3. AI plan & review</h2><p>Edit, reorder or remove anything before prompts are created.</p></div><button class="btn" id="regenBtn">↻ Regenerate plan</button></div>
+ <div class="card">
+  <div class="head"><h2>Characters</h2><span class="chip" id="charBadge">0</span></div>
+  <div class="body"><div class="charGrid" id="charGrid"></div></div>
+ </div>
+ <div class="card">
+  <div class="head"><h2>Scene plan</h2><span class="chip" id="sceneBadge">0 scenes</span></div>
+  <div class="body"><div class="scene-list" id="sceneList"></div>
+   <div class="actions"><button class="btn primary" id="promptBtn">Generate image prompts →</button></div>
+   <div class="status" id="promptStatus"></div>
+  </div>
+ </div>
+</section>
+
+<section class="section locked" id="promptSection">
+ <div class="section-title"><div><h2>4. Image-ready prompts</h2><p>Every prompt is based on the AI scene plan, style and aspect ratio.</p></div><button class="btn" id="copyAllBtn">Copy all</button></div>
+ <div class="card"><div class="body"><div class="promptGrid" id="promptGrid"></div>
+  <div class="actions"><button class="btn" id="exportBtn">Export project JSON</button><button class="btn primary" id="saveFinalBtn">Save project ✓</button></div>
+  <div class="status" id="finalStatus"></div>
+ </div></div>
+</section>
+
+<div class="footerNote">Local project storage • Gemini scene planning via secure Supabase Edge Function • Build 2026.09.29</div>
+</div>
+
+<div class="modal" id="loadModal"><div class="modalBox"><div class="modalHead"><b>Saved projects</b><button class="btn" id="closeLoad">Close</button></div><div class="modalBody" id="projectList"></div></div></div>
+
 <script>
-const state={page:'studio',projectId:null,chars:[],scenes:[],style:'Cinematic Realism',ratio:'16:9',sceneCount:10,output:'Cinematic story',assets:[],prompts:[],consistent:true};
-const styles=[['Cinematic Realism','🎬','Natural lighting, film-grade composition, realistic textures'],['Animated 3D','🧸','Polished 3D characters, soft studio lighting, expressive'],['Anime','🌸','Clean linework, stylized characters, cinematic backgrounds'],['Illustration','🖌️','Editorial illustration, textured brushwork, rich shapes'],['Comic','💥','Graphic panels, strong silhouettes, expressive action'],['Watercolor','🌊','Soft washes, paper texture, atmospheric edges']];
-const $=s=>document.querySelector(s); const $$=s=>[...document.querySelectorAll(s)];
-const STORAGE='tooldr-story-projects';
-const CURRENT='tooldr-current-project';
+const AI_URL='https://icjuhjbkndtebhdbefzm.supabase.co/functions/v1/tooldr-story-ai';
+const STORAGE='tooldr-story-projects-v2',CURRENT='tooldr-current-project-v2';
+const state={projectId:null,chars:[],scenes:[],prompts:[],output:'Cinematic story',ratio:'16:9',sceneCount:10,style:'Cinematic Realism'};
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 
-function nav(page){state.page=page;$$('.page').forEach(x=>x.classList.toggle('hidden',x.id!==page));$$('[data-page]').forEach(x=>x.classList.toggle('active',x.dataset.page===page));$('#crumb').textContent=page[0].toUpperCase()+page.slice(1)}
-$$('[data-page]').forEach(b=>b.onclick=()=>nav(b.dataset.page));
-$$('.chips').forEach(group=>group.onclick=e=>{
- if(!e.target.classList.contains('chip'))return;
- group.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));e.target.classList.add('on');
- if(group.id==='ratios')state.ratio=e.target.textContent;
- if(group.id==='counts')state.sceneCount=e.target.textContent==='Custom'?10:Number(e.target.textContent);
- if(group.id==='types')state.output=e.target.textContent;
-});
-$$('[data-switch]').forEach(x=>x.onclick=()=>{x.classList.toggle('on');state.consistent=x.classList.contains('on');saveLocal()});
-const story=$('#story');
-function counts(){$('#wordCount').textContent=(story.value.trim().match(/\S+/g)||[]).length;$('#charCount').textContent=state.chars.length;$('#sceneCount').textContent=state.scenes.length}
-story.oninput=counts;
+function status(msg,type=''){const el=$('#status');el.textContent=msg;el.className='status '+type}
+function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function words(){return ($('#story').value.trim().match(/\S+/g)||[]).length}
+function refreshStats(){$('#words').textContent=words();$('#sceneTotal').textContent=state.scenes.length;$('#charTotal').textContent=state.chars.length;$('#sceneBadge').textContent=state.scenes.length+' scenes';$('#charBadge').textContent=state.chars.length+' characters'}
+function setStep(n){for(let i=1;i<=4;i++){const x=$('#step'+i);x.classList.toggle('active',i===n);x.classList.toggle('done',i<n)}}
+function selectChips(id,cb){$('#'+id).onclick=e=>{const b=e.target.closest('.chip');if(!b)return;$$('#'+id+' .chip').forEach(x=>x.classList.remove('on'));b.classList.add('on');cb(b.textContent)}}
+selectChips('types',v=>state.output=v);selectChips('ratios',v=>state.ratio=v);selectChips('counts',v=>state.sceneCount=Number(v));selectChips('styles',v=>state.style=v);
+$('#story').oninput=refreshStats;
 
-function snapshot(){
- return {...state,story:story.value,projectName:$('#projectName').value.trim()||'Untitled Story',savedAt:new Date().toISOString()};
+function snapshot(){return{...state,story:$('#story').value.trim(),projectName:$('#projectName').value.trim()||'Untitled Story',savedAt:new Date().toISOString()}}
+function projects(){try{return JSON.parse(localStorage.getItem(STORAGE)||'[]')}catch(e){return[]}}
+function save(show=true){const d=snapshot();if(!state.projectId)state.projectId='local-'+Date.now();d.projectId=state.projectId;const list=projects();const i=list.findIndex(x=>x.projectId===d.projectId);if(i>=0)list[i]=d;else list.unshift(d);localStorage.setItem(STORAGE,JSON.stringify(list));localStorage.setItem(CURRENT,JSON.stringify(d));if(show){$('#saveBtn').textContent='Saved ✓';setTimeout(()=>$('#saveBtn').textContent='Save',1000)}}
+function apply(d){Object.assign(state,{projectId:d.projectId||null,chars:d.chars||[],scenes:d.scenes||[],prompts:d.prompts||[],output:d.output||'Cinematic story',ratio:d.ratio||'16:9',sceneCount:d.sceneCount||10,style:d.style||'Cinematic Realism'});$('#projectName').value=d.projectName||'';$('#story').value=d.story||'';syncSelections();renderAll();if(state.scenes.length)unlockResults();if(state.prompts.length)unlockPrompts();refreshStats()}
+function syncSelections(){[['types',state.output],['ratios',state.ratio],['counts',String(state.sceneCount)],['styles',state.style]].forEach(([id,val])=>$$('#'+id+' .chip').forEach(b=>b.classList.toggle('on',b.textContent===val)))}
+function unlockResults(){ $('#resultSection').classList.remove('locked');setStep(3)}
+function unlockPrompts(){$('#promptSection').classList.remove('locked');setStep(4)}
+function renderChars(){const g=$('#charGrid');if(!state.chars.length){g.innerHTML='<div class="empty" style="grid-column:1/-1"><strong>No characters detected</strong>The AI will extract the main characters from your story.</div>';return}g.innerHTML=state.chars.map(c=>'<div class="char"><b>'+esc(c.name)+'</b><p>'+esc(c.description||c.desc||'No description')+'</p></div>').join('')}
+function renderScenes(){const g=$('#sceneList');if(!state.scenes.length){g.innerHTML='<div class="empty"><strong>No scenes yet</strong>Create an AI plan above.</div>';return}g.innerHTML=state.scenes.map((s,i)=>'<div class="scene"><div class="sceneTop"><div class="num">'+(i+1)+'</div><div><input class="sceneTitle" data-title="'+i+'" value="'+esc(s.title||('Scene '+(i+1)))'"><p class="sceneDesc">'+esc([s.description,s.location,s.time,s.shot_type].filter(Boolean).join(' · '))+'</p></div><div class="sceneActions"><button class="mini" data-up="'+i+'">↑</button><button class="mini" data-down="'+i+'">↓</button><button class="mini" data-del="'+i+'">×</button></div></div></div>').join('');
+$$('[data-title]').forEach(x=>x.onchange=()=>{state.scenes[+x.dataset.title].title=x.value;save(false)});
+$$('[data-up]').forEach(x=>x.onclick=()=>move(+x.dataset.up,-1));$$('[data-down]').forEach(x=>x.onclick=()=>move(+x.dataset.down,1));$$('[data-del]').forEach(x=>x.onclick=()=>{state.scenes.splice(+x.dataset.del,1);state.prompts=[];renderScenes();refreshStats();$('#promptSection').classList.add('locked');save(false)});
 }
-function getProjects(){try{return JSON.parse(localStorage.getItem(STORAGE)||'[]')}catch(e){return[]}}
-function putProjects(list){localStorage.setItem(STORAGE,JSON.stringify(list))}
-function saveLocal(){
- const d=snapshot();
- if(!state.projectId)state.projectId='local-'+Date.now();
- d.projectId=state.projectId;
- const list=getProjects();const i=list.findIndex(x=>x.projectId===d.projectId);
- if(i>=0)list[i]=d;else list.unshift(d);
- putProjects(list);
- localStorage.setItem(CURRENT,JSON.stringify(d));
- const b=$('#saveDraft');if(b){b.textContent='Saved ✓';setTimeout(()=>b.textContent='Save draft',1200)}
- return d;
-}
-function applyProject(d){
- Object.assign(state,{page:'studio',projectId:d.projectId||null,chars:d.chars||[],scenes:d.scenes||[],style:d.style||'Cinematic Realism',ratio:d.ratio||'16:9',sceneCount:d.sceneCount||10,output:d.output||'Cinematic story',assets:d.assets||[],prompts:d.prompts||[],consistent:d.consistent!==false});
- story.value=d.story||'';
- $('#projectName').value=d.projectName||'Untitled Story';
- $('#styleName').textContent=state.style;
- renderChars();renderScenes();renderAssets();counts();
- const sw=$('[data-switch]');if(sw)sw.classList.toggle('on',state.consistent);
- nav('studio');
-}
-function loadLocal(){
- try{const d=JSON.parse(localStorage.getItem(CURRENT)||'null');if(d)applyProject(d)}
- catch(e){}
-}
+function move(i,d){const j=i+d;if(j<0||j>=state.scenes.length)return;[state.scenes[i],state.scenes[j]]=[state.scenes[j],state.scenes[i]];state.prompts=[];renderScenes();refreshStats();$('#promptSection').classList.add('locked');save(false)}
+function renderPrompts(){const g=$('#promptGrid');g.innerHTML=state.prompts.map((p,i)=>'<div class="promptCard"><b>Scene '+(i+1)+' — '+esc(state.scenes[i]?.title||'Scene')+'</b><textarea class="textarea promptText" readonly>'+esc(p)+'</textarea><button class="mini" data-copy="'+i+'">Copy prompt</button></div>').join('');$$('[data-copy]').forEach(b=>b.onclick=async()=>{const p=state.prompts[+b.dataset.copy];try{await navigator.clipboard.writeText(p);b.textContent='Copied ✓';setTimeout(()=>b.textContent='Copy prompt',900)}catch(e){const t=document.createElement('textarea');t.value=p;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();b.textContent='Copied ✓'}})}
+function renderAll(){renderChars();renderScenes();if(state.prompts.length){renderPrompts()}else{$('#promptGrid').innerHTML=''}refreshStats()}
+
 async function plan(){
- if(!story.value.trim()){alert('Add a story or idea first.');return}
- const btn=$('#planStory'); const old=btn.textContent;
- btn.disabled=true; btn.textContent='AI is planning…';
+ const story=$('#story').value.trim();if(!story){status('Paste a story first.','err');$('#story').focus();return}
+ const btn=$('#planBtn'),old=btn.textContent;btn.disabled=true;btn.textContent='AI is planning…';$('#aiState').textContent='AI working';status('Sending your story to the Story AI…');
  try{
-  const response=await fetch('https://icjuhjbkndtebhdbefzm.supabase.co/functions/v1/tooldr-story-ai',{
-   method:'POST',
-   headers:{'Content-Type':'application/json'},
-   body:JSON.stringify({
-    story:story.value.trim(),
-    sceneCount:Number(state.sceneCount)||10,
-    output:state.output,
-    style:state.style,
-    ratio:state.ratio,
-    consistent:state.consistent
-   })
-  });
-  const data=await response.json();
-  if(!response.ok||!data.ok) throw new Error(data.error||'AI scene planning failed.');
-  if(data.title && ($('#projectName').value.trim()===''||$('#projectName').value.trim()==='Untitled Story')) $('#projectName').value=data.title;
-  state.chars=(data.characters||[]).map(c=>({name:c.name,desc:c.description||'',image:''}));
-  state.scenes=(data.scenes||[]).map((s,i)=>({
-   scene_order:s.scene_order||i+1,
-   title:s.title||('Scene '+(i+1)),
-   description:s.description||'',
-   location:s.location||'',
-   time:s.time||'',
-   action:s.action||'',
-   camera:s.camera||'',
-   shot_type:s.shot_type||'',
-   mood:s.mood||'',
-   prompt:s.prompt||''
-  }));
-  state.prompts=state.scenes.map(s=>s.prompt||'');
-  renderChars();renderScenes();counts();saveLocal();nav('scenes');
- }catch(e){alert(e.message||'Could not connect to Story AI.')}
- finally{btn.disabled=false;btn.textContent=old}
+  const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),45000);
+  const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({story,sceneCount:Number(state.sceneCount),output:state.output,style:state.style,ratio:state.ratio,consistent:true}),signal:controller.signal});clearTimeout(timer);
+  const raw=await r.text();let data;try{data=JSON.parse(raw)}catch(e){throw new Error('AI returned an invalid response.')};if(!r.ok||!data.ok)throw new Error(data.error||('AI request failed ('+r.status+').'));
+  state.chars=(data.characters||[]).map(c=>({name:c.name||'Character',description:c.description||''}));
+  state.scenes=(data.scenes||[]).map((s,i)=>({scene_order:i+1,title:s.title||('Scene '+(i+1)),description:s.description||'',location:s.location||'',time:s.time||'',action:s.action||'',camera:s.camera||'',shot_type:s.shot_type||'',mood:s.mood||'',prompt:s.prompt||''}));
+  state.prompts=[];if(data.title&&!$('#projectName').value.trim())$('#projectName').value=data.title;
+  save(false);renderAll();unlockResults();$('#aiState').textContent='AI ready';status('AI scene plan created successfully.','ok');document.getElementById('resultSection').scrollIntoView({behavior:'smooth',block:'start'});
+ }catch(e){$('#aiState').textContent='AI error';status(e.name==='AbortError'?'AI request timed out. Check the Supabase function.':(e.message||'Could not connect to Story AI.'),'err')}finally{btn.disabled=false;btn.textContent=old}
 }
-function renderScenes(){
- const g=$('#sceneGrid');
- if(!state.scenes.length){g.innerHTML='<div class="empty"><div class="big">▦</div><b>No scenes yet</b><p>Create a scene plan from your story.</p></div>';return}
- g.innerHTML=state.scenes.map((x,i)=>{
-  const title=typeof x==='string'?x:(x.title||('Scene '+(i+1)));
-  const desc=typeof x==='string'?'Editable scene · camera · characters · environment · action':[x.description,x.location,x.time,x.shot_type].filter(Boolean).join(' · ');
-  return '<div class="scene"><div class="num">'+(i+1)+'</div><div><input class="scene-edit" data-i="'+i+'" value="'+esc(title)+'"><p>'+esc(desc)+'</p></div><div class="scene-actions"><button class="smallbtn" data-up="'+i+'">↑</button><button class="smallbtn" data-down="'+i+'">↓</button><button class="smallbtn" data-del="'+i+'">×</button></div></div>';
- }).join('');
- $('.scene-edit').forEach(el=>el.onchange=()=>{
-  const i=+el.dataset.i;
-  if(typeof state.scenes[i]==='string') state.scenes[i]=el.value;
-  else state.scenes[i].title=el.value;
-  saveLocal();
- });
- $('[data-up]').forEach(b=>b.onclick=()=>move(+b.dataset.up,-1));
- $('[data-down]').forEach(b=>b.onclick=()=>move(+b.dataset.down,1));
- $('[data-del]').forEach(b=>b.onclick=()=>{state.scenes.splice(+b.dataset.del,1);renderScenes();counts();saveLocal()});
-}
-function move(i,d){const j=i+d;if(j<0||j>=state.scenes.length)return;[state.scenes[i],state.scenes[j]]=[state.scenes[j],state.scenes[i]];renderScenes();saveLocal()}
-function esc(v){return String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-
-function renderChars(){
- const g=$('#charGrid');$('#charBadge').textContent=state.chars.length+' characters';$('#charCount').textContent=state.chars.length;
- if(!state.chars.length){g.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="big">♙</div><b>No characters yet</b><p>Add reusable characters for any story.</p></div>';return}
- g.innerHTML=state.chars.map((c,i)=>'<div class="mini"><div class="avatar">'+(c.image?'<img class="thumb" src="'+c.image+'">':(c.emoji||'👤'))+'</div><b>'+esc(c.name)+'</b><p>'+esc(c.desc||'No description yet.')+'</p><button class="smallbtn" data-char-del="'+i+'" style="margin-top:8px">Delete</button></div>').join('');
- $$('[data-char-del]').forEach(b=>b.onclick=()=>{state.chars.splice(+b.dataset.charDel,1);renderChars();counts();saveLocal()});
-}
-function openChar(){$('#charModal').classList.add('show');$('#charName').value='';$('#charDesc').value='';$('#charFile').value='';$('#charPreview').innerHTML='📷<br><small>Optional reference image</small>'}
-function closeChar(){$('#charModal').classList.remove('show')}
-$('#addChar').onclick=openChar;$('#charCancel').onclick=closeChar;$('#charCancel2').onclick=closeChar;
-$('#charFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>$('#charPreview').innerHTML='<img class="thumb" src="'+r.result+'"><small>'+esc(f.name)+'</small>';r.readAsDataURL(f)};
-$('#charSave').onclick=()=>{const name=$('#charName').value.trim();if(!name)return;const f=$('#charFile').files[0];if(f){const r=new FileReader();r.onload=()=>finishChar(name,$('#charDesc').value,r.result);r.readAsDataURL(f)}else finishChar(name,$('#charDesc').value,'')};
-function finishChar(name,desc,image){state.chars.push({name,desc:desc||'Reusable character profile.',image});renderChars();counts();saveLocal();closeChar()}
-
-function renderAssets(){
- const g=$('#assetGrid');if(!state.assets.length){g.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="big">▧</div><b>No assets yet</b><p>Upload reference images or project media.</p></div>';return}
- g.innerHTML=state.assets.map((a,i)=>'<div class="asset"><img src="'+a.data+'"><div class="meta">'+esc(a.name)+'<br><button class="smallbtn" data-asset-del="'+i+'">Delete</button></div></div>').join('');
- $$('[data-asset-del]').forEach(b=>b.onclick=()=>{state.assets.splice(+b.dataset.assetDel,1);renderAssets();saveLocal()});
-}
-$('#uploadAsset').onclick=()=>$('#assetFile').click();
-$('#assetFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{state.assets.push({name:f.name,data:r.result});renderAssets();saveLocal()};r.readAsDataURL(f)};
-
-$('#planStory').onclick=plan;$('#openScenes').onclick=plan;
-function buildPrompt(scene,i){
- if(typeof scene==='object' && scene.prompt) return scene.prompt;
- const title=typeof scene==='string'?scene:(scene.title||('Scene '+(i+1)));
- const cast=state.chars.length?state.chars.map(c=>c.name+(c.desc?' — '+c.desc:'')).join('; '):'No fixed character profile yet';
- return 'Scene '+(i+1)+': '+title+'. '+story.value.trim()+'. Characters: '+cast+'. Visual style: '+state.style+'. Cinematic composition, natural lighting, detailed environment, consistent character appearance, clear subject/action, professional film still, '+state.ratio+' aspect ratio.';
-}
-async function generatePrompts(){
- if(!state.scenes.length){
-  await plan();
-  if(!state.scenes.length)return;
- }
- state.prompts=state.scenes.map((s,i)=>buildPrompt(s,i));
- saveLocal();
- $('#promptList').innerHTML=state.prompts.map((p,i)=>'<div class="mini"><b>Scene '+(i+1)+'</b><textarea class="textarea prompt-text" readonly style="min-height:120px;margin-top:8px">'+esc(p)+'</textarea><button class="smallbtn prompt-copy" data-copy="'+i+'" style="margin-top:8px">Copy prompt</button></div>').join('');
- $('.prompt-copy').forEach(b=>b.onclick=async()=>{const p=state.prompts[+b.dataset.copy];try{await navigator.clipboard.writeText(p);b.textContent='Copied ✓';setTimeout(()=>b.textContent='Copy prompt',1000)}catch(e){alert(p)}});
- $('#promptModal').classList.add('show');
-}
-$('#generatePrompts').onclick=generatePrompts;
-$('#promptClose').onclick=()=>$('#promptModal').classList.remove('show');
-$('#saveDraft').onclick=saveLocal;
-$('#newProject').onclick=()=>{if(!confirm('Start a new project? Unsaved changes will be cleared.'))return;state.projectId=null;state.chars=[];state.scenes=[];state.assets=[];story.value='';$('#projectName').value='Untitled Story';renderChars();renderScenes();renderAssets();counts();nav('studio')};
-
-$('#styleGrid').innerHTML=styles.map((s,i)=>'<div class="mini" style="cursor:pointer" data-style="'+i+'"><div class="avatar">'+s[1]+'</div><b>'+s[0]+'</b><p>'+s[2]+'</p><button class="smallbtn" style="margin-top:9px">Use style</button></div>').join('');
-$$('[data-style]').forEach(c=>c.onclick=()=>{state.style=styles[+c.dataset.style][0];$('#styleName').textContent=state.style;saveLocal()});
-
-function listProjects(){
- const list=getProjects();const box=$('#projectList');
- box.innerHTML=list.length?list.map(p=>'<button class="tooltab" data-project="'+p.projectId+'" style="text-align:left;padding:12px"><b>'+esc(p.projectName||'Untitled Story')+'</b><br><small>'+new Date(p.savedAt||Date.now()).toLocaleString()+'</small></button>').join(''):'<div class="empty"><b>No saved projects yet.</b><p>Save your current project first.</p></div>';
- $('#projectModal').classList.add('show');
- $$('[data-project]').forEach(b=>b.onclick=()=>{const p=getProjects().find(x=>x.projectId===b.dataset.project);if(p){applyProject(p);localStorage.setItem(CURRENT,JSON.stringify(p))}$('#projectModal').classList.remove('show')});
-}
-$('#loadProject').onclick=listProjects;
-$('#projectClose').onclick=()=>$('#projectModal').classList.remove('show');
-
-loadLocal();renderChars();renderScenes();renderAssets();counts();
+async function generatePrompts(){if(!state.scenes.length){status('Create the AI plan first.','err');return}const btn=$('#promptBtn');btn.disabled=true;btn.textContent='Building prompts…';$('#promptStatus').textContent='';try{state.prompts=state.scenes.map((s,i)=>s.prompt||('Create a '+state.style+' image for scene '+(i+1)+'. '+s.title+'. '+s.description+' Location: '+s.location+'. Time: '+s.time+'. Action: '+s.action+'. Camera: '+s.camera+'. Mood: '+s.mood+'. Keep character appearance consistent. '+state.ratio+' aspect ratio.'));save(false);renderPrompts();unlockPrompts();$('#promptStatus').textContent='All '+state.prompts.length+' prompts are ready.';document.getElementById('promptSection').scrollIntoView({behavior:'smooth',block:'start'})}finally{btn.disabled=false;btn.textContent='Generate image prompts →'}}
+$('#planBtn').onclick=plan;$('#regenBtn').onclick=plan;$('#promptBtn').onclick=generatePrompts;$('#saveBtn').onclick=()=>save(true);$('#saveFinalBtn').onclick=()=>{$('#finalStatus').textContent='Project saved locally ✓';save(true)};
+$('#copyAllBtn').onclick=async()=>{const txt=state.prompts.map((p,i)=>'SCENE '+(i+1)+'\n'+p).join('\n\n');if(!txt){$('#finalStatus').textContent='Generate prompts first.';return}try{await navigator.clipboard.writeText(txt);$('#finalStatus').textContent='All prompts copied ✓'}catch(e){$('#finalStatus').textContent='Copy was blocked by the browser.'}};
+$('#exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(snapshot(),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(($('#projectName').value.trim()||'tooldr-story').replace(/[^a-z0-9]+/gi,'-').toLowerCase())+'.json';a.click();URL.revokeObjectURL(a.href)};
+$('#newBtn').onclick=()=>{if(!confirm('Start a new project?'))return;Object.assign(state,{projectId:null,chars:[],scenes:[],prompts:[],output:'Cinematic story',ratio:'16:9',sceneCount:10,style:'Cinematic Realism'});$('#projectName').value='';$('#story').value='';$('#resultSection').classList.add('locked');$('#promptSection').classList.add('locked');$('#aiState').textContent='AI ready';syncSelections();renderAll();setStep(1);status('New project ready.');window.scrollTo({top:0,behavior:'smooth'})};
+function openLoad(){const list=projects(),box=$('#projectList');box.innerHTML=list.length?list.map(p=>'<button class="project" data-project="'+p.projectId+'"><b>'+esc(p.projectName||'Untitled Story')+'</b><br><small>'+new Date(p.savedAt||Date.now()).toLocaleString()+'</small></button>').join(''):'<div class="empty"><strong>No saved projects</strong>Save a project first.';$('#loadModal').classList.add('show');$$('[data-project]').forEach(b=>b.onclick=()=>{const p=list.find(x=>x.projectId===b.dataset.project);if(p){apply(p);$('#loadModal').classList.remove('show');window.scrollTo({top:0,behavior:'smooth'})}})}
+$('#loadBtn').onclick=openLoad;$('#closeLoad').onclick=()=>$('#loadModal').classList.remove('show');
+try{const d=JSON.parse(localStorage.getItem(CURRENT)||'null');if(d)apply(d);else refreshStats()}catch(e){refreshStats()}
 </script>
-</body></html>
+</body>
+</html>
