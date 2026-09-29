@@ -86,11 +86,11 @@
   </div></div>
  </section>
 <input id="assetFile" type="file" accept="image/*" class="hidden">
-<div class="modal" id="projectModal"><div class="modalbox"><div class="modalhead"><b>Load project</b><button class="iconbtn" id="projectClose">×</button></div><div class="modalbody"><div id="projectList" class="scenegrid"></div></div></div></div>
+<div class="modal" id="promptModal"><div class="modalbox"><div class="modalhead"><b>Generated scene prompts</b><button class="iconbtn" id="promptClose">×</button></div><div class="modalbody"><div id="promptList" class="scenegrid"></div></div></div></div><div class="modal" id="projectModal"><div class="modalbox"><div class="modalhead"><b>Load project</b><button class="iconbtn" id="projectClose">×</button></div><div class="modalbody"><div id="projectList" class="scenegrid"></div></div></div></div>
 <div class="modal" id="charModal"><div class="modalbox"><div class="modalhead"><b>Add character</b><button class="iconbtn" id="charCancel">×</button></div><div class="modalbody"><div class="field"><div class="label">Character name</div><input class="input" id="charName" placeholder="e.g. Arjun"></div><div class="field"><div class="label">Description</div><textarea class="textarea" id="charDesc" style="min-height:120px" placeholder="Appearance, age, personality, clothing, distinctive features..."></textarea></div><div class="field"><div class="label">Reference image</div><label class="filedrop" for="charFile" id="charPreview">📷<br><small>Optional reference image</small></label><input id="charFile" type="file" accept="image/*" class="hidden"></div></div><div class="modalfoot"><button class="ghost" id="charCancel2">Cancel</button><button class="primary" id="charSave">Add character</button></div></div></div></main>
 </div>
 <script>
-const state={page:'studio',projectId:null,chars:[],scenes:[],style:'Cinematic Realism',ratio:'16:9',sceneCount:10,output:'Cinematic story',assets:[],consistent:true};
+const state={page:'studio',projectId:null,chars:[],scenes:[],style:'Cinematic Realism',ratio:'16:9',sceneCount:10,output:'Cinematic story',assets:[],prompts:[],consistent:true};
 const styles=[['Cinematic Realism','🎬','Natural lighting, film-grade composition, realistic textures'],['Animated 3D','🧸','Polished 3D characters, soft studio lighting, expressive'],['Anime','🌸','Clean linework, stylized characters, cinematic backgrounds'],['Illustration','🖌️','Editorial illustration, textured brushwork, rich shapes'],['Comic','💥','Graphic panels, strong silhouettes, expressive action'],['Watercolor','🌊','Soft washes, paper texture, atmospheric edges']];
 const $=s=>document.querySelector(s); const $$=s=>[...document.querySelectorAll(s)];
 const STORAGE='tooldr-story-projects';
@@ -127,7 +127,7 @@ function saveLocal(){
  return d;
 }
 function applyProject(d){
- Object.assign(state,{page:'studio',projectId:d.projectId||null,chars:d.chars||[],scenes:d.scenes||[],style:d.style||'Cinematic Realism',ratio:d.ratio||'16:9',sceneCount:d.sceneCount||10,output:d.output||'Cinematic story',assets:d.assets||[],consistent:d.consistent!==false});
+ Object.assign(state,{page:'studio',projectId:d.projectId||null,chars:d.chars||[],scenes:d.scenes||[],style:d.style||'Cinematic Realism',ratio:d.ratio||'16:9',sceneCount:d.sceneCount||10,output:d.output||'Cinematic story',assets:d.assets||[],prompts:d.prompts||[],consistent:d.consistent!==false});
  story.value=d.story||'';
  $('#projectName').value=d.projectName||'Untitled Story';
  $('#styleName').textContent=state.style;
@@ -180,7 +180,20 @@ $('#uploadAsset').onclick=()=>$('#assetFile').click();
 $('#assetFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{state.assets.push({name:f.name,data:r.result});renderAssets();saveLocal()};r.readAsDataURL(f)};
 
 $('#planStory').onclick=plan;$('#openScenes').onclick=plan;
-$('#generatePrompts').onclick=()=>{if(!state.scenes.length)return alert('Create scenes first.');alert('Scene prompts are ready for the next AI generation layer.')};
+function buildPrompt(scene,i){
+ const cast=state.chars.length?state.chars.map(c=>c.name+(c.desc?' — '+c.desc:'')).join('; '):'No fixed character profile yet';
+ return 'Scene '+(i+1)+': '+scene+'. '+story.value.trim()+'. Characters: '+cast+'. Visual style: '+state.style+'. Cinematic composition, natural lighting, detailed environment, consistent character appearance, clear subject/action, professional film still, '+state.ratio+' aspect ratio.';
+}
+function generatePrompts(){
+ if(!state.scenes.length){alert('Create scenes first.');return}
+ state.prompts=state.scenes.map((s,i)=>buildPrompt(s,i));
+ saveLocal();
+ $('#promptList').innerHTML=state.prompts.map((p,i)=>'<div class="mini"><b>Scene '+(i+1)+'</b><textarea class="textarea prompt-text" readonly style="min-height:120px;margin-top:8px">'+esc(p)+'</textarea><button class="smallbtn prompt-copy" data-copy="'+i+'" style="margin-top:8px">Copy prompt</button></div>').join('');
+ $('.prompt-copy').forEach(b=>b.onclick=async()=>{const p=state.prompts[+b.dataset.copy];try{await navigator.clipboard.writeText(p);b.textContent='Copied ✓';setTimeout(()=>b.textContent='Copy prompt',1000)}catch(e){alert(p)}});
+ $('#promptModal').classList.add('show');
+}
+$('#generatePrompts').onclick=generatePrompts;
+$('#promptClose').onclick=()=>$('#promptModal').classList.remove('show');
 $('#saveDraft').onclick=saveLocal;
 $('#newProject').onclick=()=>{if(!confirm('Start a new project? Unsaved changes will be cleared.'))return;state.projectId=null;state.chars=[];state.scenes=[];state.assets=[];story.value='';$('#projectName').value='Untitled Story';renderChars();renderScenes();renderAssets();counts();nav('studio')};
 
