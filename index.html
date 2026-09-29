@@ -40,7 +40,7 @@
    <div class="field"><div class="label">Aspect ratio</div><div class="chips" id="ratios"><button class="chip on">16:9</button><button class="chip">9:16</button><button class="chip">1:1</button><button class="chip">4:5</button></div></div>
   </div>
   <div class="grid2">
-   <div class="field"><div class="label">Scenes</div><div class="chips" id="counts"><button class="chip">5</button><button class="chip on">10</button><button class="chip">15</button><button class="chip">20</button></div></div>
+   <div class="field"><div class="label">Scenes</div><div class="notice" style="padding:10px 12px"><b id="autoSceneCount">Auto-detect</b><br><span id="autoSceneHint">ToolDr will decide the scene count from the story's length and visual beats.</span></div></div>
    <div class="field"><div class="label">Visual style</div><div class="chips" id="styles"><button class="chip on">Cinematic Realism</button><button class="chip">Anime</button><button class="chip">Animated 3D</button><button class="chip">Illustration</button></div></div>
   </div>
   <div class="stats"><div class="stat"><b id="words">0</b><span>Words</span></div><div class="stat"><b id="sceneTotal">0</b><span>Scenes</span></div><div class="stat"><b id="charTotal">0</b><span>Characters</span></div></div>
@@ -89,8 +89,26 @@ function words(){return ($('#story').value.trim().match(/\S+/g)||[]).length}
 function refreshStats(){$('#words').textContent=words();$('#sceneTotal').textContent=state.scenes.length;$('#charTotal').textContent=state.chars.length;$('#sceneBadge').textContent=state.scenes.length+' scenes';$('#charBadge').textContent=state.chars.length+' characters'}
 function setStep(n){for(let i=1;i<=4;i++){const x=$('#step'+i);x.classList.toggle('active',i===n);x.classList.toggle('done',i<n)}}
 function selectChips(id,cb){$('#'+id).onclick=e=>{const b=e.target.closest('.chip');if(!b)return;$$('#'+id+' .chip').forEach(x=>x.classList.remove('on'));b.classList.add('on');cb(b.textContent)}}
-selectChips('types',v=>state.output=v);selectChips('ratios',v=>state.ratio=v);selectChips('counts',v=>state.sceneCount=Number(v));selectChips('styles',v=>state.style=v);
-$('#story').oninput=refreshStats;
+selectChips('types',v=>state.output=v);selectChips('ratios',v=>state.ratio=v);selectChips('styles',v=>state.style=v);
+function autoSceneCount(text){
+ const w=(text.trim().match(/\S+/g)||[]).length;
+ if(!w)return 0;
+ const paragraphs=text.split(/\n\s*\n/).filter(x=>x.trim()).length;
+ const sentences=(text.match(/[.!?]+(?=\s|$)/g)||[]).length;
+ const dialogue=(text.match(/["“”]/g)||[]).length/2;
+ let count=Math.round(w/95);
+ if(paragraphs>=6)count+=Math.min(2,Math.floor(paragraphs/8));
+ if(sentences>=25)count+=1;
+ if(dialogue>=4)count+=1;
+ return Math.min(30,Math.max(3,count));
+}
+function updateAutoSceneCount(){
+ const n=autoSceneCount($('#story').value);
+ if(n){state.sceneCount=n;$('#autoSceneCount').textContent='Auto-detected: '+n+' scenes';$('#autoSceneHint').textContent='Based on story length, paragraph density and visual/narrative beat changes. You can still edit or delete scenes after planning.'}
+ else{$('#autoSceneCount').textContent='Auto-detect';$('#autoSceneHint').textContent='Paste your story and ToolDr will calculate an appropriate scene count automatically.'}
+ refreshStats();
+}
+$('#story').oninput=updateAutoSceneCount;
 
 function snapshot(){return{...state,story:$('#story').value.trim(),projectName:$('#projectName').value.trim()||'Untitled Story',savedAt:new Date().toISOString()}}
 function projects(){try{return JSON.parse(localStorage.getItem(STORAGE)||'[]')}catch(e){return[]}}
@@ -112,6 +130,8 @@ function renderAll(){renderChars();renderScenes();if(state.prompts.length){rende
 
 async function plan(){
  const story=$('#story').value.trim();if(!story){status('Paste a story first.','err');$('#story').focus();return}
+ state.sceneCount=autoSceneCount(story);
+ updateAutoSceneCount();
  const btn=$('#planBtn'),old=btn.textContent;btn.disabled=true;btn.textContent='AI is planning…';$('#aiState').textContent='AI working';status('Sending your story to the Story AI…');
  try{
   const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),45000);
@@ -131,10 +151,10 @@ async function generateAllImages(){if(!state.scenes.length){$('#finalStatus').te
 $('#planBtn').onclick=plan;$('#regenBtn').onclick=plan;$('#promptBtn').onclick=generatePrompts;$('#generateImagesBtn').onclick=generateAllImages;$('#saveBtn').onclick=()=>save(true);$('#saveFinalBtn').onclick=()=>{$('#finalStatus').textContent='Project saved locally ✓';save(true)};
 $('#copyAllBtn').onclick=async()=>{const txt=state.prompts.map((p,i)=>'SCENE '+(i+1)+'\n'+p).join('\n\n');if(!txt){$('#finalStatus').textContent='Generate prompts first.';return}try{await navigator.clipboard.writeText(txt);$('#finalStatus').textContent='All prompts copied ✓'}catch(e){$('#finalStatus').textContent='Copy was blocked by the browser.'}};
 $('#exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(snapshot(),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(($('#projectName').value.trim()||'tooldr-story').replace(/[^a-z0-9]+/gi,'-').toLowerCase())+'.json';a.click();URL.revokeObjectURL(a.href)};
-$('#newBtn').onclick=()=>{if(!confirm('Start a new project?'))return;Object.assign(state,{projectId:null,chars:[],scenes:[],prompts:[],images:[],output:'Cinematic story',ratio:'16:9',sceneCount:10,style:'Cinematic Realism'});$('#projectName').value='';$('#story').value='';$('#resultSection').classList.add('locked');$('#promptSection').classList.add('locked');$('#aiState').textContent='AI ready';syncSelections();renderAll();setStep(1);status('New project ready.');window.scrollTo({top:0,behavior:'smooth'})};
+$('#newBtn').onclick=()=>{if(!confirm('Start a new project?'))return;Object.assign(state,{projectId:null,chars:[],scenes:[],prompts:[],images:[],output:'Cinematic story',ratio:'16:9',sceneCount:0,style:'Cinematic Realism'});$('#projectName').value='';$('#story').value='';$('#resultSection').classList.add('locked');$('#promptSection').classList.add('locked');$('#aiState').textContent='AI ready';syncSelections();renderAll();updateAutoSceneCount();setStep(1);status('New project ready.');window.scrollTo({top:0,behavior:'smooth'})};
 function openLoad(){const list=projects(),box=$('#projectList');box.innerHTML=list.length?list.map(p=>'<button class="project" data-project="'+p.projectId+'"><b>'+esc(p.projectName||'Untitled Story')+'</b><br><small>'+new Date(p.savedAt||Date.now()).toLocaleString()+'</small></button>').join(''):'<div class="empty"><strong>No saved projects</strong>Save a project first.';$('#loadModal').classList.add('show');$$('[data-project]').forEach(b=>b.onclick=()=>{const p=list.find(x=>x.projectId===b.dataset.project);if(p){apply(p);$('#loadModal').classList.remove('show');window.scrollTo({top:0,behavior:'smooth'})}})}
 $('#loadBtn').onclick=openLoad;$('#closeLoad').onclick=()=>$('#loadModal').classList.remove('show');
-try{const d=JSON.parse(localStorage.getItem(CURRENT)||'null');if(d)apply(d);else refreshStats()}catch(e){refreshStats()}
+try{const d=JSON.parse(localStorage.getItem(CURRENT)||'null');if(d)apply(d);else updateAutoSceneCount()}catch(e){updateAutoSceneCount()}
 </script>
 </body>
 </html>
