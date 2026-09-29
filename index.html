@@ -139,21 +139,61 @@ function loadLocal(){
  try{const d=JSON.parse(localStorage.getItem(CURRENT)||'null');if(d)applyProject(d)}
  catch(e){}
 }
-function plan(){
+async function plan(){
  if(!story.value.trim()){alert('Add a story or idea first.');return}
- const n=Number(state.sceneCount)||10;
- const base=['Opening / Establishing shot','Inciting moment','Character introduction','First turning point','Rising action','Key discovery','Conflict','Emotional beat','Climax','Closing shot'];
- state.scenes=Array.from({length:n},(_,i)=>base[i%base.length]+(i>=base.length?' — beat '+(i+1):''));
- renderScenes();counts();saveLocal();nav('scenes');
+ const btn=$('#planStory'); const old=btn.textContent;
+ btn.disabled=true; btn.textContent='AI is planning…';
+ try{
+  const response=await fetch('https://icjuhjbkndtebhdbefzm.supabase.co/functions/v1/tooldr-story-ai',{
+   method:'POST',
+   headers:{'apikey':'sb_publishable_d9b-3vD5yALras2ReqNDmg_rwjB_cG6','Content-Type':'application/json'},
+   body:JSON.stringify({
+    story:story.value.trim(),
+    sceneCount:Number(state.sceneCount)||10,
+    output:state.output,
+    style:state.style,
+    ratio:state.ratio,
+    consistent:state.consistent
+   })
+  });
+  const data=await response.json();
+  if(!response.ok||!data.ok) throw new Error(data.error||'AI scene planning failed.');
+  if(data.title && ($('#projectName').value.trim()===''||$('#projectName').value.trim()==='Untitled Story')) $('#projectName').value=data.title;
+  state.chars=(data.characters||[]).map(c=>({name:c.name,desc:c.description||'',image:''}));
+  state.scenes=(data.scenes||[]).map((s,i)=>({
+   scene_order:s.scene_order||i+1,
+   title:s.title||('Scene '+(i+1)),
+   description:s.description||'',
+   location:s.location||'',
+   time:s.time||'',
+   action:s.action||'',
+   camera:s.camera||'',
+   shot_type:s.shot_type||'',
+   mood:s.mood||'',
+   prompt:s.prompt||''
+  }));
+  state.prompts=state.scenes.map(s=>s.prompt||'');
+  renderChars();renderScenes();counts();saveLocal();nav('scenes');
+ }catch(e){alert(e.message||'Could not connect to Story AI.')}
+ finally{btn.disabled=false;btn.textContent=old}
 }
 function renderScenes(){
  const g=$('#sceneGrid');
  if(!state.scenes.length){g.innerHTML='<div class="empty"><div class="big">▦</div><b>No scenes yet</b><p>Create a scene plan from your story.</p></div>';return}
- g.innerHTML=state.scenes.map((x,i)=>'<div class="scene"><div class="num">'+(i+1)+'</div><div><input class="scene-edit" data-i="'+i+'" value="'+esc(x)+'"><p>Editable scene · camera · characters · environment · action</p></div><div class="scene-actions"><button class="smallbtn" data-up="'+i+'">↑</button><button class="smallbtn" data-down="'+i+'">↓</button><button class="smallbtn" data-del="'+i+'">×</button></div></div>').join('');
- $$('.scene-edit').forEach(el=>el.onchange=()=>{state.scenes[el.dataset.i]=el.value;saveLocal()});
- $$('[data-up]').forEach(b=>b.onclick=()=>move(+b.dataset.up,-1));
- $$('[data-down]').forEach(b=>b.onclick=()=>move(+b.dataset.down,1));
- $$('[data-del]').forEach(b=>b.onclick=()=>{state.scenes.splice(+b.dataset.del,1);renderScenes();counts();saveLocal()});
+ g.innerHTML=state.scenes.map((x,i)=>{
+  const title=typeof x==='string'?x:(x.title||('Scene '+(i+1)));
+  const desc=typeof x==='string'?'Editable scene · camera · characters · environment · action':[x.description,x.location,x.time,x.shot_type].filter(Boolean).join(' · ');
+  return '<div class="scene"><div class="num">'+(i+1)+'</div><div><input class="scene-edit" data-i="'+i+'" value="'+esc(title)+'"><p>'+esc(desc)+'</p></div><div class="scene-actions"><button class="smallbtn" data-up="'+i+'">↑</button><button class="smallbtn" data-down="'+i+'">↓</button><button class="smallbtn" data-del="'+i+'">×</button></div></div>';
+ }).join('');
+ $('.scene-edit').forEach(el=>el.onchange=()=>{
+  const i=+el.dataset.i;
+  if(typeof state.scenes[i]==='string') state.scenes[i]=el.value;
+  else state.scenes[i].title=el.value;
+  saveLocal();
+ });
+ $('[data-up]').forEach(b=>b.onclick=()=>move(+b.dataset.up,-1));
+ $('[data-down]').forEach(b=>b.onclick=()=>move(+b.dataset.down,1));
+ $('[data-del]').forEach(b=>b.onclick=()=>{state.scenes.splice(+b.dataset.del,1);renderScenes();counts();saveLocal()});
 }
 function move(i,d){const j=i+d;if(j<0||j>=state.scenes.length)return;[state.scenes[i],state.scenes[j]]=[state.scenes[j],state.scenes[i]];renderScenes();saveLocal()}
 function esc(v){return String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
@@ -181,8 +221,10 @@ $('#assetFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new 
 
 $('#planStory').onclick=plan;$('#openScenes').onclick=plan;
 function buildPrompt(scene,i){
+ if(typeof scene==='object' && scene.prompt) return scene.prompt;
+ const title=typeof scene==='string'?scene:(scene.title||('Scene '+(i+1)));
  const cast=state.chars.length?state.chars.map(c=>c.name+(c.desc?' — '+c.desc:'')).join('; '):'No fixed character profile yet';
- return 'Scene '+(i+1)+': '+scene+'. '+story.value.trim()+'. Characters: '+cast+'. Visual style: '+state.style+'. Cinematic composition, natural lighting, detailed environment, consistent character appearance, clear subject/action, professional film still, '+state.ratio+' aspect ratio.';
+ return 'Scene '+(i+1)+': '+title+'. '+story.value.trim()+'. Characters: '+cast+'. Visual style: '+state.style+'. Cinematic composition, natural lighting, detailed environment, consistent character appearance, clear subject/action, professional film still, '+state.ratio+' aspect ratio.';
 }
 function generatePrompts(){
  if(!state.scenes.length){alert('Create scenes first.');return}
