@@ -110,9 +110,9 @@ function updateAutoSceneCount(){
 }
 $('#story').oninput=updateAutoSceneCount;
 
-function snapshot(){return{...state,story:$('#story').value.trim(),projectName:$('#projectName').value.trim()||'Untitled Story',savedAt:new Date().toISOString()}}
+function snapshot(){return{...state,images:[],story:$('#story').value.trim(),projectName:$('#projectName').value.trim()||'Untitled Story',savedAt:new Date().toISOString()}}
 function projects(){try{return JSON.parse(localStorage.getItem(STORAGE)||'[]')}catch(e){return[]}}
-function save(show=true){const d=snapshot();if(!state.projectId)state.projectId='local-'+Date.now();d.projectId=state.projectId;const list=projects();const i=list.findIndex(x=>x.projectId===d.projectId);if(i>=0)list[i]=d;else list.unshift(d);localStorage.setItem(STORAGE,JSON.stringify(list));localStorage.setItem(CURRENT,JSON.stringify(d));if(show){$('#saveBtn').textContent='Saved ✓';setTimeout(()=>$('#saveBtn').textContent='Save',1000)}}
+function save(show=true){const d=snapshot();if(!state.projectId)state.projectId='local-'+Date.now();d.projectId=state.projectId;const list=projects();const i=list.findIndex(x=>x.projectId===d.projectId);if(i>=0)list[i]=d;else list.unshift(d);try{localStorage.setItem(STORAGE,JSON.stringify(list));localStorage.setItem(CURRENT,JSON.stringify(d));if(show){$('#saveBtn').textContent='Saved ✓';setTimeout(()=>$('#saveBtn').textContent='Save',1000)}}catch(e){if(show)$('#saveBtn').textContent='Save'}}
 function apply(d){Object.assign(state,{projectId:d.projectId||null,chars:d.chars||[],scenes:d.scenes||[],prompts:d.prompts||[],images:d.images||[],output:d.output||'Cinematic story',ratio:d.ratio||'16:9',sceneCount:d.sceneCount||10,style:d.style||'Cinematic Realism'});$('#projectName').value=d.projectName||'';$('#story').value=d.story||'';syncSelections();renderAll();if(state.scenes.length)unlockResults();if(state.prompts.length)unlockPrompts();refreshStats()}
 function syncSelections(){[['types',state.output],['ratios',state.ratio],['counts',String(state.sceneCount)],['styles',state.style]].forEach(([id,val])=>$('#'+id+' .chip').forEach(b=>b.classList.toggle('on',b.textContent===val)))}
 function unlockResults(){ $('#resultSection').classList.remove('locked');setStep(3)}
