@@ -96,11 +96,11 @@ function autoSceneCount(text){
  const paragraphs=text.split(/\n\s*\n/).filter(x=>x.trim()).length;
  const sentences=(text.match(/[.!?]+(?=\s|$)/g)||[]).length;
  const dialogue=(text.match(/["“”]/g)||[]).length/2;
- let count=Math.round(w/95);
- if(paragraphs>=6)count+=Math.min(2,Math.floor(paragraphs/8));
- if(sentences>=25)count+=1;
+ let count=Math.round(w/45);
+ if(paragraphs>=4)count+=Math.min(2,Math.floor(paragraphs/5));
+ if(sentences>=18)count+=1;
  if(dialogue>=4)count+=1;
- return Math.min(30,Math.max(3,count));
+ return Math.min(30,Math.max(4,count));
 }
 function updateAutoSceneCount(){
  const n=autoSceneCount($('#story').value);
